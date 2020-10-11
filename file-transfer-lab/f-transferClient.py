@@ -1,9 +1,11 @@
 #! /usr/bin/env python3
 
-import socket, sys, re
+#Echo client program
+import socket, sys, re, os
 
 sys.path.append("../lib")       # for params
 import params
+
 from framedSock import framedSend, framedReceive
 
 switchesVarDefaults = (
@@ -38,10 +40,20 @@ if s is None:
 
 s.connect(addrPort)
 
-print("sending hello world")
-framedSend(s, b"hello world", debug)
-print("received:", framedReceive(s, debug))
+fileSending = input("File name: ")
 
-print("sending hello world")
-framedSend(s, b"hello world", debug)
-print("received:", framedReceive(s, debug))
+try:
+        filename = open(fileSending, 'rb')
+        data = filename.read()
+except FileNotFoundError:
+        print("File does not exist")
+        sys.exit(1)
+
+if len(data) == 0:
+        print("File is empty")
+        sys.exit(1)
+
+print("Sending files")
+
+framedSend(s, data, debug)
+                
