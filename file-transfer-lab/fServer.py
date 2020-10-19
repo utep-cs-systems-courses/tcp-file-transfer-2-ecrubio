@@ -40,5 +40,5 @@ while True:
                         payload = payload.decode()
                 
                         output = open(payload, wb)
-                        output.write(payload2)
+                        output.write(payload)
                         sock.close()
