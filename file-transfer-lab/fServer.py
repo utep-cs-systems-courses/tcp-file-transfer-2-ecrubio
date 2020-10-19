@@ -2,7 +2,7 @@
 
 import sys, os
 sys.path.append("../lib")       # for params
-import re, socket, params
+import re, socket, params, os
 
 switchesVarDefaults = (
         (('-l', '--listenPort') ,'listenPort', 50001),
@@ -26,31 +26,19 @@ lsock.bind(bindAddr)
 lsock.listen(5)
 print("listening on:", bindAddr)
 
-from framedSock import framedSend, framedReceive
-
 while True:
         sock, addr = lsock.accept()
-        if not os.fork():
-                print("Connection rec'd from", addr)
-        payload = None
-        try:
-                payload, contents = framedRecieve(sock, debug)
-        except:
-                print("File transfer failed")
-                sys.exit(1)
-        
-        if payload is None:
-                print("File not accepted")
-                sys.exit(1)
 
-        filename = payload.decode()
+        from framedSock import framedSend, framedReceive
         
-        if not os.path.isFile(filename):
-                output = open(filename, 'wb')
-                output.write(contents)
-                output.close()
-                print("File", filename, "accepted")
-                sys.exit(1)
-        else:
-                print("File", filename, "not accepted")
-                sys.exit(1)
+        if not os.fork():
+                while True:
+                        payload = framedReceive(sock, debug)
+                        if debug: print("rec'd: ", payload)
+                        if not payload:
+                                break
+                        payload = payload.decode()
+                
+                        output = open(payload, wb)
+                        output.write(payload2)
+                        sock.close()

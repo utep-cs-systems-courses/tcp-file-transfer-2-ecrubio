@@ -21,6 +21,7 @@ server, usage, debug  = paramMap["server"], paramMap["usage"], paramMap["debug"]
 
 if usage:
         params.usage()
+        
 try:
     serverHost, serverPort = re.split(":", server)
     serverPort = int(serverPort)
@@ -40,22 +41,17 @@ if s is None:
 
 s.connect(addrPort)
 
-#while True:
-#        fileSending 
-fileSending = input("File name: ")
-
-try:
-        filename = open(fileSending, 'rb')
-        data = filename.read()
-except FileNotFoundError:
-        print("File does not exist")
+while True:
+        filename = input("File name: ")
+        try:
+                fileOpen = open(filename, "rb")
+                break
+        except FileNotFoundError:
+                print("File not found")
+fileData = fileOpen.read()
+if len(fileData) == 0:
+        print("File not sent, empty file")
         sys.exit(1)
-
-if len(data) == 0:
-        print("File is empty")
-        sys.exit(1)
-
-print("Sending files")
-
-framedSend(s, data, debug)
-                
+else:
+        print("Sending file")
+        framedSend(s, fileData, debug)                
