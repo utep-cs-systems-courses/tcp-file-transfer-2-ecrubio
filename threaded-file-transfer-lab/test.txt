@@ -1,0 +1,2 @@
+New test for threading.
+Lets see how it works.
