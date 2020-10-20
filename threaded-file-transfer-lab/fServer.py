@@ -3,6 +3,12 @@
 import sys, os
 sys.path.append("../lib")       # for params
 import re, socket, params, os
+from threading import Lock
+
+global dictMap
+global lock
+dictMap = set()
+lock = Lock()
 
 switchesVarDefaults = (
             (('-l', '--listenPort') ,'listenPort', 50001),
@@ -29,6 +35,25 @@ print("listening on:", bindAddr)
 from threading import Thread;
 from encapFramedSock import EncapFramedSock
 
+def transferStart(filename):
+    global dictMap, lock
+    lock.aquire()
+    #checking if filename is in the set(it is being accessed by other)
+    if filename in dictMap:
+        print("File not available")
+        lock.release()
+        sys.exit(1)
+    else:
+        dictMap.add(filename)
+        lock.release()
+
+def transferEnd(filename):
+    global dictMap, lock
+    lock.aquire()
+    #The file is removed from the set one it is done being used
+    dictMap.remove(filename)
+    lock.release()
+
 class Server(Thread):
     def __init__(self, sockAddr):
         Thread.__init__(self)
@@ -43,11 +68,14 @@ class Server(Thread):
                 if debug: print(f"thread connected to {addr} done")
                 self.fsock.close()
                 return          # exit
-            payload = payload.decode()
-            payload += b"!"             # make emphatic!
 
-            output = open(payload, wb)
+            payload = payload.decode()
+
+            transferStart(payload)
+            output = open(payload, 'wb')
             output.write(payload)
+            output.close()
+            transferEnd(payload)
             self.fsock.send(payload, debug)
 
 while True:

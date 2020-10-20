@@ -32,10 +32,10 @@ class EncapFramedSock:               # a facade
                     payload = self.rbuf[0:msgLength]
                     self.rbuf = self.rbuf[msgLength:]
                     return payload
-                r = self.sock.recv(100)
-                self.rbuf += r
-                if len(r) == 0:
-                    if len(self.rbuf) != 0:
-                        print("FramedReceive: incomplete message. \n state=%s, length=%d, self.rbuf=%s" % (state, msgLength, self.rbuf))
-                    return None
-                if debugPrint: print("FramedReceive: state=%s, length=%d, self.rbuf=%s" % (state, msgLength, self.rbuf))
+            r = self.sock.recv(100)
+            self.rbuf += r
+            if len(r) == 0:
+                if len(self.rbuf) != 0:
+                    print("FramedReceive: incomplete message. \n state=%s, length=%d, self.rbuf=%s" % (state, msgLength, self.rbuf))
+                return None
+            if debugPrint: print("FramedReceive: state=%s, length=%d, self.rbuf=%s" % (state, msgLength, self.rbuf))
